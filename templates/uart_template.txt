@@ -1,0 +1,32 @@
+`timescale 1ns/1ps
+
+module {{ module_name }}_tb;
+    reg clk, rst, tx_enable;
+    reg logic [7:0] tx_data;
+    wire logic tx, rx;
+
+    // DUT Instantiation
+    {{ module_name }} uut (
+        .clk(clk),
+        .rst(rst),
+        .tx_enable(tx_enable),
+        .tx_data(tx_data),
+        .tx(tx),
+        .rx(rx)
+    );
+
+    always #5 clk = ~clk;
+
+    initial begin
+        $dumpfile("{{ module_name }}.vcd");
+        $dumpvars(0, {{ module_name }}_tb);
+
+        clk = 0; rst = 1; tx_enable = 0; tx_data = 8'h00;
+
+        #10 rst = 0;
+        #10 tx_enable = 1; tx_data = 8'h55; // Transmit Data
+        #50 tx_enable = 0; // Stop Transmission
+
+        #100 $finish;
+    end
+endmodule

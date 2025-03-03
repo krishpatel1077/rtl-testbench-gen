@@ -1,0 +1,37 @@
+`timescale 1ns/1ps
+
+module {{ module_name }}_tb;
+    // Signals
+    reg clk, rst;
+    reg logic [3:0] op;
+    reg logic [7:0] a, b;
+    wire logic [7:0] result;
+
+    // DUT Instantiation
+    {{ module_name }} uut (
+        .clk(clk),
+        .rst(rst),
+        .op(op),
+        .a(a),
+        .b(b),
+        .result(result)
+    );
+
+    // Clock Generation
+    always #5 clk = ~clk;
+
+    // Test Sequence
+    initial begin
+        $dumpfile("{{ module_name }}.vcd");
+        $dumpvars(0, {{ module_name }}_tb);
+
+        clk = 0; rst = 1; op = 4'b0000; a = 0; b = 0;
+
+        #10 rst = 0;
+        #10 op = 4'b0001; a = 8'hFF; b = 8'h01; // ADD
+        #20 op = 4'b0010; a = 8'hF0; b = 8'h0F; // AND
+        #30 op = 4'b0011; a = 8'hAA; b = 8'h55; // XOR
+
+        #100 $finish;
+    end
+endmodule

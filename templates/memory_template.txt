@@ -1,0 +1,32 @@
+`timescale 1ns/1ps
+
+module {{ module_name }}_tb;
+    reg clk, rst, we;
+    reg logic [7:0] addr, data_in;
+    wire logic [7:0] data_out;
+
+    // DUT Instantiation
+    {{ module_name }} uut (
+        .clk(clk),
+        .rst(rst),
+        .we(we),
+        .addr(addr),
+        .data_in(data_in),
+        .data_out(data_out)
+    );
+
+    always #5 clk = ~clk;
+
+    initial begin
+        $dumpfile("{{ module_name }}.vcd");
+        $dumpvars(0, {{ module_name }}_tb);
+
+        clk = 0; rst = 1; we = 0; addr = 0; data_in = 0;
+
+        #10 rst = 0;
+        #10 we = 1; addr = 8'h10; data_in = 8'hAA; // Write
+        #20 we = 0; addr = 8'h10; // Read
+
+        #100 $finish;
+    end
+endmodule
